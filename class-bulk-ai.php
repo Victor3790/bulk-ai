@@ -27,6 +27,9 @@ if ( ! class_exists( '\Vk_custom_libs\Templates' ) ) {
 	require_once namespace\PATH . 'includes/vk_libraries/class_vk_template.php';
 }
 
+require_once namespace\PATH . 'includes/class-bulk-ai-template.php';
+require_once namespace\PATH . 'includes/class-bulk-ai-list-table.php';
+
 use Vk_custom_libs\Template;
 use Vk_custom_libs\Settings;
 
@@ -52,6 +55,8 @@ class Bulk_AI {
 
 		add_action( 'admin_menu', array( $this, 'register_pages' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+
+		add_action( 'init', array( $this, 'register_bulkai_template_post_type' ) );
 
 	}
 
@@ -92,29 +97,29 @@ class Bulk_AI {
 			'Bulk AI',
 			'Bulk AI',
 			'manage_options',
-			'bulk-ai-settings-page',
-			array( $this, 'load_settings_dashboard' ),
+			'bulk-ai-page',
+			array( $this, 'load_templates_dashboard' ),
 			'',
 			5
 		);
 
 		add_submenu_page(
-			'bulk-ai-settings-page',
-			'Bulk AI submenu 1',
-			'Bulk ai submenu 1',
+			'bulk-ai-page',
+			'Templates',
+			'Templates',
 			'manage_options',
-			'bulk-ai-settings-page',
-			array( $this, 'load_settings_dashboard' ),
+			'bulk-ai-page',
+			array( $this, 'load_templates_dashboard' ),
 			1
 		);
 
 		add_submenu_page(
-			'bulk-ai-settings-page',
-			'Bulk AI submenu 2',
-			'Bulk ai submenu 2',
+			'bulk-ai-page',
+			'Settings',
+			'Settings',
 			'manage_options',
-			'bulk-ai-settings-submenu-page',
-			array( $this, 'load_templates_dashboard' ),
+			'bulk-ai-settings-page',
+			array( $this, 'load_settings_dashboard' ),
 			2
 		);
 
@@ -155,11 +160,58 @@ class Bulk_AI {
 	}
 
 	/**
-	 * Echo the templates list.
+	 * Echo the templates views.
 	 */
 	public function load_templates_dashboard(): void {
 
-		echo 'Templates dashboard';
+		$template = new Template();
+
+		if ( isset( $_GET['view'] ) && 'template-form' === $_GET['view'] ) {
+
+			if ( isset( $_POST['bulkai-save-template-nonce'] ) ) {
+
+				$nonce = sanitize_text_field( wp_unslash( $_POST['bulkai-save-template-nonce'] ) );
+
+				if ( ! wp_verify_nonce( $nonce, 'bulkai-save-template' ) ) {
+
+					echo 'There was an error, please contact tech support.';
+					return;
+
+				}
+
+				$view = $template->load( namespace\PATH . 'templates/edit-template-form.php' );
+
+				//phpcs:ignore
+				echo $view;
+				return;
+			}
+
+			$view = $template->load( namespace\PATH . 'templates/new-template-form.php' );
+
+			//phpcs:ignore
+			echo $view;
+			return;
+
+		}
+
+		$list_table = new Bulk_AI_List_Table();
+		$view       = $template->load( namespace\PATH . 'templates/templates-dashboard.php', array( 'list_table' => $list_table ) );
+
+		//phpcs:ignore
+		echo $view;
+
+	}
+
+	/**
+	 * Add the Bulk AI Template post type.
+	 */
+	public function register_bulkai_template_post_type(): void {
+
+		$args = array(
+			'public' => true,
+		);
+
+		register_post_type( 'bulk-ai-template', $args );
 
 	}
 
