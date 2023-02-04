@@ -61,6 +61,7 @@ class Bulk_AI {
 		add_action( 'init', array( $this, 'register_bulkai_template_post_type' ) );
 
 		add_action( 'admin_post_bulk_ai_create_template', array( $bulk_ai_template, 'create_template' ) );
+		add_action( 'admin_post_bulk_ai_update_template', array( $bulk_ai_template, 'update_template' ) );
 
 	}
 
