@@ -58,6 +58,8 @@ class Bulk_AI {
 
 		add_action( 'init', array( $this, 'register_bulkai_template_post_type' ) );
 
+		add_action( 'admin_post_bulk_ai_create_template', array( $this, 'create_template' ) );
+
 	}
 
 	/**
@@ -165,37 +167,28 @@ class Bulk_AI {
 	public function load_templates_dashboard(): void {
 
 		$template = new Template();
+		$request  = $this->get_request();
 
-		if ( isset( $_GET['view'] ) && 'template-form' === $_GET['view'] ) {
+		switch ( $request['type'] ) {
 
-			if ( isset( $_POST['bulkai-save-template-nonce'] ) ) {
+			case 'template-list':
+				$list_table = new Bulk_AI_List_Table();
+				$view       = $template->load( namespace\PATH . 'templates/templates-dashboard.php', array( 'list_table' => $list_table ) );
+				break;
 
-				$nonce = sanitize_text_field( wp_unslash( $_POST['bulkai-save-template-nonce'] ) );
+			case 'new-template-form':
+				$view = $template->load( namespace\PATH . 'templates/new-template-form.php' );
+				break;
 
-				if ( ! wp_verify_nonce( $nonce, 'bulkai-save-template' ) ) {
+			case 'edit-template-form':
+				$template_data = get_post( $request['template-id'], 'ARRAY_A' );
+				$view          = $template->load( namespace\PATH . 'templates/edit-template-form.php', array( 'template_data' => $template_data ) );
+				break;
 
-					echo 'There was an error, please contact tech support.';
-					return;
-
-				}
-
-				$view = $template->load( namespace\PATH . 'templates/edit-template-form.php' );
-
-				//phpcs:ignore
-				echo $view;
-				return;
-			}
-
-			$view = $template->load( namespace\PATH . 'templates/new-template-form.php' );
-
-			//phpcs:ignore
-			echo $view;
-			return;
-
+			default:
+				$view = 'Error, contact tech support';
+				break;
 		}
-
-		$list_table = new Bulk_AI_List_Table();
-		$view       = $template->load( namespace\PATH . 'templates/templates-dashboard.php', array( 'list_table' => $list_table ) );
 
 		//phpcs:ignore
 		echo $view;
@@ -212,6 +205,161 @@ class Bulk_AI {
 		);
 
 		register_post_type( 'bulk-ai-template', $args );
+
+	}
+
+	/**
+	 * Create a new template.
+	 */
+	public function create_template(): void {
+
+		if ( empty( $_POST['bulkai-create-template-nonce'] ) ) {
+
+			$new_template_form_url = $this->get_new_template_form_url();
+			$redirect_url          = add_query_arg( 'result-code', '0', $new_template_form_url );
+
+			wp_safe_redirect( $redirect_url );
+			exit;
+
+		}
+
+		$nonce = sanitize_text_field( wp_unslash( $_POST['bulkai-create-template-nonce'] ) );
+
+		if ( ! wp_verify_nonce( $nonce, 'bulkai-create-template' ) ) {
+
+			$new_template_form_url = $this->get_new_template_form_url();
+			$redirect_url          = add_query_arg( 'result-code', '0', $new_template_form_url );
+
+			wp_safe_redirect( $redirect_url );
+			exit;
+
+		}
+
+		if ( empty( $_POST['template-name'] ) || empty( $_POST['template-content'] ) ) {
+
+			$new_template_form_url = $this->get_new_template_form_url();
+			$redirect_url          = add_query_arg( 'result-code', '0', $new_template_form_url );
+
+			wp_safe_redirect( $redirect_url );
+			exit;
+
+		}
+
+		$template['name']    = sanitize_text_field( wp_unslash( $_POST['template-name'] ) );
+		$template['content'] = sanitize_text_field( wp_unslash( $_POST['template-content'] ) );
+
+		$bulk_ai_template = new Bulk_AI_Template();
+		$template_id      = $bulk_ai_template->create( $template );
+
+		if ( 0 === $template_id ) {
+
+			$new_template_form_url = $this->get_new_template_form_url();
+			$redirect_url          = add_query_arg( 'result-code', '0', $new_template_form_url );
+
+			wp_safe_redirect( $redirect_url );
+			exit;
+
+		}
+
+		$edit_url = add_query_arg(
+			array(
+				'page'          => 'bulk-ai-page',
+				'view'          => 'edit-template-form',
+				'template-id'   => $template_id,
+				'result-code'   => '1',
+				'bulk-ai-nonce' => wp_create_nonce( 'bulk-ai-show-edit-template-form' . $template_id ),
+			),
+			admin_url( 'admin.php' )
+		);
+
+		wp_safe_redirect( $edit_url );
+		exit;
+
+	}
+
+	/**
+	 * Return the request type and some extra data if needed.
+	 */
+	private function get_request(): array {
+
+		$request         = array();
+		$request['type'] = '';
+
+		if ( ! isset( $_GET['view'] ) ) {
+
+			$request['type'] = 'template-list';
+			return $request;
+
+		}
+
+		if ( 'new-template-form' === $_GET['view'] ) {
+
+			if ( empty( $_GET['bulk-ai-nonce'] ) ) {
+
+				return $request;
+
+			}
+
+			$nonce = sanitize_text_field( wp_unslash( $_GET['bulk-ai-nonce'] ) );
+
+			if ( wp_verify_nonce( $nonce, 'bulk-ai-show-new-template-form' ) ) {
+
+				$request['type'] = 'new-template-form';
+				return $request;
+
+			}
+
+			return $request;
+		}
+
+		if ( 'edit-template-form' === $_GET['view'] ) {
+
+			if ( empty( $_GET['template-id'] ) || ! is_numeric( $_GET['template-id'] ) ) {
+
+				return $request;
+
+			}
+
+			$template_id = sanitize_text_field( wp_unslash( $_GET['template-id'] ) );
+
+			if ( empty( $_GET['bulk-ai-nonce'] ) ) {
+
+				return $request;
+
+			}
+
+			$nonce = sanitize_text_field( wp_unslash( $_GET['bulk-ai-nonce'] ) );
+
+			if ( wp_verify_nonce( $nonce, 'bulk-ai-show-edit-template-form' . $template_id ) ) {
+
+				$request['type']        = 'edit-template-form';
+				$request['template-id'] = $template_id;
+				return $request;
+
+			}
+
+			return $request;
+		}
+
+		return $request;
+
+	}
+
+	/**
+	 * Generate a new template form url
+	 */
+	private function get_new_template_form_url(): string {
+
+		$url = add_query_arg(
+			array(
+				'page'          => 'bulk-ai-page',
+				'view'          => 'new-template-form',
+				'bulk-ai-nonce' => wp_create_nonce( 'bulk-ai-show-new-template-form' ),
+			),
+			admin_url( 'admin.php' )
+		);
+
+		return $url;
 
 	}
 

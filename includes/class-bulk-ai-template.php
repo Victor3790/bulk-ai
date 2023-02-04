@@ -14,19 +14,22 @@ class Bulk_AI_Template {
 
 	/**
 	 * Create a new template
+	 *
+	 * @param array $template_data contains the name and content for the new template.
 	 */
-	public function create(): int {
+	public function create( array $template_data ): int {
 
 		$template_id = wp_insert_post(
 			array(
-				'post_title'   => 'Title',
-				'post-content' => 'content',
-				'post_status'  => 'publish',
+				'post_title'   => $template_data['name'],
+				'post_content' => $template_data['content'],
+				'post_status'  => 'private',
 				'post_type'    => 'bulk-ai-template',
 			)
 		);
 
 		if ( is_wp_error( $template_id ) ) {
+
 			return 0;
 		}
 

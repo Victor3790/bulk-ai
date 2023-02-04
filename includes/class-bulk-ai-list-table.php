@@ -57,7 +57,17 @@ class Bulk_AI_List_Table extends WP_List_Table {
 	 * @param string $column_name the column name.
 	 */
 	protected function column_default( $item, $column_name ): void {
-		echo esc_html( $item[ $column_name ] );
+
+		$edit_template_form_url = wp_nonce_url(
+			admin_url( 'admin.php?page=bulk-ai-page&view=edit-template-form&template-id=' . $item['ID'] ),
+			'bulk-ai-show-edit-template-form' . $item['ID'],
+			'bulk-ai-nonce'
+		);
+
+		echo '<a href="' . esc_url( $edit_template_form_url ) . '">' .
+			esc_html( $item[ $column_name ] ) .
+			'</a>';
+
 	}
 
 }
