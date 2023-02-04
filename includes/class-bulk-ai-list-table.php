@@ -37,7 +37,20 @@ class Bulk_AI_List_Table extends WP_List_Table {
 	 * Get the templates.
 	 */
 	public function prepare_items(): void {
-		$query          = new \WP_Query( array( 'post_type' => 'bulk-ai-template' ) );
+
+		$args = array(
+			'post_type' => 'bulk-ai-template',
+		);
+
+		//phpcs:ignore
+		if ( isset( $_GET['paged'] ) && is_numeric( $_GET['paged'] ) ) {
+
+			//phpcs:ignore
+			$args['paged'] = $_GET['paged'];
+
+		}
+
+		$query          = new \WP_Query( $args );
 		$template_posts = $query->get_posts();
 		$templates      = array();
 
@@ -48,6 +61,15 @@ class Bulk_AI_List_Table extends WP_List_Table {
 		}
 
 		$this->items = $templates;
+
+		$post_count = wp_count_posts( 'bulk-ai-template' );
+
+		$this->set_pagination_args(
+			array(
+				'total_items' => $post_count->private,
+				'per_page'    => get_option( 'posts_per_page' ),
+			)
+		);
 	}
 
 	/**
@@ -64,9 +86,9 @@ class Bulk_AI_List_Table extends WP_List_Table {
 			'bulk-ai-nonce'
 		);
 
-		echo '<a href="' . esc_url( $edit_template_form_url ) . '">' .
+		echo '<strong><a href="' . esc_url( $edit_template_form_url ) . '">' .
 			esc_html( $item[ $column_name ] ) .
-			'</a>';
+			'</a></strong>';
 
 	}
 
