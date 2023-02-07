@@ -67,6 +67,7 @@ class Bulk_AI {
 
 		add_action( 'admin_post_bulk_ai_create_template', array( $bulk_ai_template, 'create_template' ) );
 		add_action( 'admin_post_bulk_ai_update_template', array( $bulk_ai_template, 'update_template' ) );
+		add_action( 'admin_post_bulk_ai_delete_template', array( $bulk_ai_template, 'delete_template' ) );
 
 	}
 

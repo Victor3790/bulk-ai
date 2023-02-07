@@ -106,12 +106,6 @@ class Bulk_AI_Template {
 
 		$nonce = sanitize_text_field( wp_unslash( $_POST['bulkai-update-template-nonce'] ) );
 
-		if ( ! wp_verify_nonce( $nonce, 'bulkai-update-template' ) ) {
-
-			$this->redirect_to_main();
-
-		}
-
 		if ( empty( $_POST['template-id'] ) ) {
 
 			$this->redirect_to_main();
@@ -119,6 +113,12 @@ class Bulk_AI_Template {
 		}
 
 		$template_id = sanitize_text_field( wp_unslash( $_POST['template-id'] ) );
+
+		if ( ! wp_verify_nonce( $nonce, 'bulkai-update-template-' . $template_id ) ) {
+
+			$this->redirect_to_main();
+
+		}
 
 		if ( empty( $_POST['template-name'] ) || empty( $_POST['section-name'] ) || empty( $_POST['section-content'] ) ) {
 
@@ -157,6 +157,43 @@ class Bulk_AI_Template {
 
 		$edit_url     = $this->get_edit_template_form_url( $updated_template_id );
 		$redirect_url = add_query_arg( 'result-code', '2', $edit_url );
+
+		wp_safe_redirect( $redirect_url );
+		exit;
+
+	}
+
+	/**
+	 * Delete the template
+	 */
+	public function delete_template(): void {
+
+		if ( empty( $_POST['bulkai-delete-template-nonce'] ) ) {
+
+			$this->redirect_to_main();
+
+		}
+
+		$nonce = sanitize_text_field( wp_unslash( $_POST['bulkai-delete-template-nonce'] ) );
+
+		if ( empty( $_POST['template-id'] ) ) {
+
+			$this->redirect_to_main();
+
+		}
+
+		$template_id = sanitize_text_field( wp_unslash( $_POST['template-id'] ) );
+
+		if ( ! wp_verify_nonce( $nonce, 'bulkai-delete-template-' . $template_id ) ) {
+
+			$this->redirect_to_main();
+
+		}
+
+		wp_delete_post( $template_id, true );
+
+		$main_url     = admin_url( 'admin.php?page=bulk-ai-page' );
+		$redirect_url = add_query_arg( 'result-code', '2', $main_url );
 
 		wp_safe_redirect( $redirect_url );
 		exit;

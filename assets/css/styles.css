@@ -77,3 +77,9 @@
     width: 100px;
     margin-top: 30px;
 }
+
+.delete-template-button 
+{
+    background-color: rgb(192, 4, 4)!important;
+    border-color: rgb(192, 4, 4)!important;
+}

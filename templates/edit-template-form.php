@@ -61,11 +61,17 @@
 			</tbody>
 		</table>
 		<div class="table-footer">
-			<div id="add-item-button" class="button input-item__button input-item__button--green">Add</div>
+			<div id="add-item-button" class="button input-item__button input-item__button--green">Add section</div>
 		</div>
 		<input type="hidden" name="action" value="bulk_ai_update_template">
 		<input type="hidden" name="template-id" value="<?php echo wp_kses( $template_data['ID'], 'post' ); ?>">
-		<?php wp_nonce_field( 'bulkai-update-template', 'bulkai-update-template-nonce' ); ?>
+		<?php wp_nonce_field( 'bulkai-update-template-' . $template_data['ID'], 'bulkai-update-template-nonce' ); ?>
 		<?php submit_button(); ?>
+	</form>
+	<form id="bulk-ai-delete-form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
+		<input type="hidden" name="action" value="bulk_ai_delete_template">
+		<input type="hidden" name="template-id" value="<?php echo wp_kses( $template_data['ID'], 'post' ); ?>">
+		<?php wp_nonce_field( 'bulkai-delete-template-' . $template_data['ID'], 'bulkai-delete-template-nonce' ); ?>
+		<?php submit_button( 'Delete template', 'delete-template-button button-primary' ); ?>
 	</form>
 </div>

@@ -20,4 +20,13 @@ jQuery( function ( $ ) {
         $(this).parents('tr').remove();
     });
 
+    $('#bulk-ai-delete-form').submit( function ( e ){
+        
+        if( confirm('Are you sure you want to delete this template') == true ) {
+            return;
+        }
+
+        e.preventDefault();
+    });
+
 });
