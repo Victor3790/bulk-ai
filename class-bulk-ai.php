@@ -19,6 +19,10 @@ if ( ! defined( __NAMESPACE__ . '\PATH' ) ) {
 	define( __NAMESPACE__ . '\PATH', plugin_dir_path( __FILE__ ) );
 }
 
+if ( ! defined( __NAMESPACE__ . '\URL' ) ) {
+	define( __NAMESPACE__ . '\URL', plugin_dir_url( __FILE__ ) );
+}
+
 if ( ! class_exists( '\Vk_custom_libs\Settings' ) ) {
 	require_once namespace\PATH . 'includes/vk_libraries/class_vk_admin_settings.php';
 }
@@ -57,6 +61,7 @@ class Bulk_AI {
 
 		add_action( 'admin_menu', array( $this, 'register_pages' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'add_assets' ) );
 
 		add_action( 'init', array( $this, 'register_bulkai_template_post_type' ) );
 
@@ -184,8 +189,10 @@ class Bulk_AI {
 				break;
 
 			case 'edit-template-form':
-				$template_data = get_post( $request['template-id'], 'ARRAY_A' );
-				$view          = $template->load( namespace\PATH . 'templates/edit-template-form.php', array( 'template_data' => $template_data ) );
+				$template_data                 = get_post( $request['template-id'], 'ARRAY_A' );
+				$template_data['post_content'] = json_decode( $template_data['post_content'], true );
+
+				$view = $template->load( namespace\PATH . 'templates/edit-template-form.php', array( 'template_data' => $template_data ) );
 				break;
 
 			default:
@@ -208,6 +215,37 @@ class Bulk_AI {
 		);
 
 		register_post_type( 'bulk-ai-template', $args );
+
+	}
+
+	/**
+	 * Enqueue style sheets and scripts.
+	 *
+	 * @param strin $page the page that is being loaded.
+	 */
+	public function add_assets( $page ): void {
+
+		if ( 'toplevel_page_bulk-ai-page' !== $page ) {
+
+			return;
+
+		}
+
+		wp_enqueue_style(
+			'bulk-ai-styles',
+			namespace\URL . 'assets/css/styles.css',
+			array(),
+			'1.0.0',
+			'all'
+		);
+
+		wp_enqueue_script(
+			'bulk-ai-script',
+			namespace\URL . 'assets/js/script.js',
+			array( 'jquery' ),
+			'1.0.0',
+			true
+		);
 
 	}
 

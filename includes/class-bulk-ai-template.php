@@ -39,7 +39,7 @@ class Bulk_AI_Template {
 
 		}
 
-		if ( empty( $_POST['template-name'] ) || empty( $_POST['template-content'] ) ) {
+		if ( empty( $_POST['template-name'] ) || empty( $_POST['section-name'] ) || empty( $_POST['section-content'] ) ) {
 
 			$new_template_form_url = $this->get_new_template_form_url();
 			$redirect_url          = add_query_arg( 'result-code', '0', $new_template_form_url );
@@ -49,9 +49,23 @@ class Bulk_AI_Template {
 
 		}
 
-		$template['name']    = sanitize_text_field( wp_unslash( $_POST['template-name'] ) );
-		$template['content'] = sanitize_text_field( wp_unslash( $_POST['template-content'] ) );
-		$template_id         = $this->insert( $template );
+		$template['name'] = sanitize_text_field( wp_unslash( $_POST['template-name'] ) );
+
+		// Get and pack the sections.
+		$content = array();
+
+		//phpcs:ignore
+		foreach ( $_POST['section-name'] as $key => $value ) {
+
+			$content['sections'][ $key ]['name'] = sanitize_text_field( wp_unslash( $value ) );
+			//phpcs:ignore
+			$content['sections'][ $key ]['content'] = sanitize_text_field( wp_unslash( $_POST['section-content'][$key] ) );
+
+		}
+
+		$template['content'] = wp_json_encode( $content );
+
+		$template_id = $this->insert( $template );
 
 		if ( 0 === $template_id ) {
 
@@ -106,7 +120,7 @@ class Bulk_AI_Template {
 
 		$template_id = sanitize_text_field( wp_unslash( $_POST['template-id'] ) );
 
-		if ( empty( $_POST['template-name'] ) || empty( $_POST['template-content'] ) ) {
+		if ( empty( $_POST['template-name'] ) || empty( $_POST['section-name'] ) || empty( $_POST['section-content'] ) ) {
 
 			$edit_template_form_url = $this->get_edit_template_form_url( $template_id );
 			$redirect_url           = add_query_arg( 'result-code', '0', $edit_template_form_url );
@@ -116,8 +130,22 @@ class Bulk_AI_Template {
 
 		}
 
-		$template['name']    = sanitize_text_field( wp_unslash( $_POST['template-name'] ) );
-		$template['content'] = sanitize_text_field( wp_unslash( $_POST['template-content'] ) );
+		$template['name'] = sanitize_text_field( wp_unslash( $_POST['template-name'] ) );
+
+		// Get and pack the sections.
+		$content = array();
+
+		//phpcs:ignore
+		foreach ( $_POST['section-name'] as $key => $value ) {
+
+			$content['sections'][ $key ]['name'] = sanitize_text_field( wp_unslash( $value ) );
+			//phpcs:ignore
+			$content['sections'][ $key ]['content'] = sanitize_text_field( wp_unslash( $_POST['section-content'][$key] ) );
+
+		}
+
+		$template['content'] = wp_json_encode( $content );
+
 		$template['id']      = $template_id;
 		$updated_template_id = $this->insert( $template );
 

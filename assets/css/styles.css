@@ -1,0 +1,79 @@
+.container
+{
+    width: 65%;
+    min-width: 500px;
+}
+
+.input-item 
+{
+    width: 100%;
+}
+
+.input-item__label 
+{
+    width: 100%;
+}
+
+.input-item__text-input 
+{
+    width: 100%;
+    height: 32px;
+    padding: 0;
+    margin: 0;
+}
+
+.input-item__textarea
+{
+    width: 100%;
+    height: 32px;
+    margin-top: 2px;
+}
+
+.input-item__button 
+{
+    height: 32px; 
+    width: 100%;
+    margin-bottom: 2px;
+    text-align: center;
+}
+
+.input-item__button--red 
+{
+    border-color: red!important;
+    color: red!important;
+}
+
+.input-item__button--green 
+{
+    border-color: green!important;
+    color: green!important;
+}
+
+.section-table 
+{
+    width: 100%;
+    margin: 30px 0;
+}
+
+.section-table__name 
+{
+    width: 30%;
+    text-align: left;
+}
+
+.section-table__content
+{
+    width: 60%;
+    text-align: left;
+}
+
+.section-table__action 
+{
+    width: 10%;
+}
+
+.table-footer 
+{
+    width: 100px;
+    margin-top: 30px;
+}
