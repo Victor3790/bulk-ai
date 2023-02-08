@@ -51,8 +51,9 @@
 			</tbody>
 		</table>
 		<div class="table-footer">
-			<div id="add-item-button" class="button input-item__button input-item__button--green">Add</div>
+			<div id="add-item-button" class="button input-item__button input-item__button--green">Add section</div>
 		</div>
+		<?php wp_editor( '', 'content', array( 'media_buttons' => false ) ); ?>
 		<input type="hidden" name="action" value="bulk_ai_create_template">
 		<?php wp_nonce_field( 'bulkai-create-template', 'bulkai-create-template-nonce' ); ?>
 		<?php submit_button(); ?>

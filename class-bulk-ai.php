@@ -190,8 +190,9 @@ class Bulk_AI {
 				break;
 
 			case 'edit-template-form':
-				$template_data                 = get_post( $request['template-id'], 'ARRAY_A' );
-				$template_data['post_content'] = json_decode( $template_data['post_content'], true );
+				$template_data             = get_post( $request['template-id'], 'ARRAY_A' );
+				$sections                  = get_post_meta( $template_data['ID'], 'sections' );
+				$template_data['sections'] = json_decode( $sections[0], true );
 
 				$view = $template->load( namespace\PATH . 'templates/edit-template-form.php', array( 'template_data' => $template_data ) );
 				break;

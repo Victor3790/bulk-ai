@@ -42,7 +42,7 @@
 				</tr>
 			</thead>
 			<tbody id="table-body">
-			<?php foreach ( $template_data['post_content']['sections'] as $section ) : ?>
+			<?php foreach ( $template_data['sections'] as $section ) : ?>
 
 				<tr>
 					<td>
@@ -63,6 +63,7 @@
 		<div class="table-footer">
 			<div id="add-item-button" class="button input-item__button input-item__button--green">Add section</div>
 		</div>
+		<?php wp_editor( $template_data['post_content'], 'content', array( 'media_buttons' => false ) ); ?>
 		<input type="hidden" name="action" value="bulk_ai_update_template">
 		<input type="hidden" name="template-id" value="<?php echo wp_kses( $template_data['ID'], 'post' ); ?>">
 		<?php wp_nonce_field( 'bulkai-update-template-' . $template_data['ID'], 'bulkai-update-template-nonce' ); ?>

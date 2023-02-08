@@ -39,7 +39,7 @@ class Bulk_AI_Template {
 
 		}
 
-		if ( empty( $_POST['template-name'] ) || empty( $_POST['section-name'] ) || empty( $_POST['section-content'] ) ) {
+		if ( empty( $_POST['template-name'] ) || empty( $_POST['section-name'] ) || empty( $_POST['section-content'] ) || empty( $_POST['content'] ) ) {
 
 			$new_template_form_url = $this->get_new_template_form_url();
 			$redirect_url          = add_query_arg( 'result-code', '0', $new_template_form_url );
@@ -52,18 +52,20 @@ class Bulk_AI_Template {
 		$template['name'] = sanitize_text_field( wp_unslash( $_POST['template-name'] ) );
 
 		// Get and pack the sections.
-		$content = array();
+		$sections = array();
 
 		//phpcs:ignore
 		foreach ( $_POST['section-name'] as $key => $value ) {
 
-			$content['sections'][ $key ]['name'] = sanitize_text_field( wp_unslash( $value ) );
+			$sections[ $key ]['name'] = sanitize_text_field( wp_unslash( $value ) );
 			//phpcs:ignore
-			$content['sections'][ $key ]['content'] = sanitize_text_field( wp_unslash( $_POST['section-content'][$key] ) );
+			$sections[ $key ]['content'] = sanitize_textarea_field( wp_unslash( $_POST['section-content'][$key] ) );
 
 		}
 
-		$template['content'] = wp_json_encode( $content );
+		$template['content'] = wp_kses( wp_unslash( $_POST['content'] ), 'post' );
+
+		$template['sections'] = wp_json_encode( $sections );
 
 		$template_id = $this->insert( $template );
 
@@ -120,7 +122,7 @@ class Bulk_AI_Template {
 
 		}
 
-		if ( empty( $_POST['template-name'] ) || empty( $_POST['section-name'] ) || empty( $_POST['section-content'] ) ) {
+		if ( empty( $_POST['template-name'] ) || empty( $_POST['section-name'] ) || empty( $_POST['section-content'] ) || empty( $_POST['content'] ) ) {
 
 			$edit_template_form_url = $this->get_edit_template_form_url( $template_id );
 			$redirect_url           = add_query_arg( 'result-code', '0', $edit_template_form_url );
@@ -133,18 +135,20 @@ class Bulk_AI_Template {
 		$template['name'] = sanitize_text_field( wp_unslash( $_POST['template-name'] ) );
 
 		// Get and pack the sections.
-		$content = array();
+		$sections = array();
 
 		//phpcs:ignore
 		foreach ( $_POST['section-name'] as $key => $value ) {
 
-			$content['sections'][ $key ]['name'] = sanitize_text_field( wp_unslash( $value ) );
+			$sections[ $key ]['name'] = sanitize_text_field( wp_unslash( $value ) );
 			//phpcs:ignore
-			$content['sections'][ $key ]['content'] = sanitize_text_field( wp_unslash( $_POST['section-content'][$key] ) );
+			$sections[ $key ]['content'] = sanitize_textarea_field( wp_unslash( $_POST['section-content'][$key] ) );
 
 		}
 
-		$template['content'] = wp_json_encode( $content );
+		$template['content'] = wp_kses( wp_unslash( $_POST['content'] ), 'post' );
+
+		$template['sections'] = wp_json_encode( $sections );
 
 		$template['id']      = $template_id;
 		$updated_template_id = $this->insert( $template );
@@ -247,10 +251,12 @@ class Bulk_AI_Template {
 	private function insert( array $template_data ): int {
 
 		$args = array(
-			'post_title'   => $template_data['name'],
-			'post_content' => $template_data['content'],
-			'post_status'  => 'private',
-			'post_type'    => 'bulk-ai-template',
+			'post_title'     => $template_data['name'],
+			'post_content'   => $template_data['content'],
+			'post_status'    => 'private',
+			'post_type'      => 'bulk-ai-template',
+			'comment_status' => 'closed',
+			'meta_input'     => array( 'sections' => $template_data['sections'] ),
 		);
 
 		if ( ! empty( $template_data['id'] ) ) {
