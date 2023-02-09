@@ -65,7 +65,7 @@ class Bulk_AI_Template {
 
 		$template['content'] = wp_kses( wp_unslash( $_POST['content'] ), 'post' );
 
-		$template['sections'] = wp_json_encode( $sections );
+		$template['sections'] = wp_json_encode( $sections, JSON_UNESCAPED_UNICODE );
 
 		$template_id = $this->insert( $template );
 
@@ -148,7 +148,7 @@ class Bulk_AI_Template {
 
 		$template['content'] = wp_kses( wp_unslash( $_POST['content'] ), 'post' );
 
-		$template['sections'] = wp_json_encode( $sections );
+		$template['sections'] = wp_json_encode( $sections, JSON_UNESCAPED_UNICODE );
 
 		$template['id']      = $template_id;
 		$updated_template_id = $this->insert( $template );

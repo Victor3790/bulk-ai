@@ -30,7 +30,7 @@ class Bulk_AI_List_Table extends WP_List_Table {
 	 * Return the column names.
 	 */
 	public function get_columns(): array {
-		return array( 'post_title' => 'Template name' );
+		return array( 'post_name' => 'Template name' );
 	}
 
 	/**

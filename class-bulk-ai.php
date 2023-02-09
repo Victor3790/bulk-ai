@@ -33,6 +33,7 @@ if ( ! class_exists( '\Vk_custom_libs\Templates' ) ) {
 
 require_once namespace\PATH . 'includes/class-bulk-ai-template.php';
 require_once namespace\PATH . 'includes/class-bulk-ai-list-table.php';
+require_once namespace\PATH . 'includes/class-bulk-ai-post.php';
 
 use Vk_custom_libs\Template;
 use Vk_custom_libs\Settings;
@@ -55,6 +56,7 @@ class Bulk_AI {
 	private function __construct() {
 
 		$bulk_ai_template = new Bulk_AI_Template();
+		$bulk_ai_post     = new Bulk_AI_Post();
 
 		register_activation_hook( __FILE__, array( $this, 'activate_plugin' ) );
 		register_deactivation_hook( __FILE__, array( $this, 'deactivate_plugin' ) );
@@ -68,6 +70,8 @@ class Bulk_AI {
 		add_action( 'admin_post_bulk_ai_create_template', array( $bulk_ai_template, 'create_template' ) );
 		add_action( 'admin_post_bulk_ai_update_template', array( $bulk_ai_template, 'update_template' ) );
 		add_action( 'admin_post_bulk_ai_delete_template', array( $bulk_ai_template, 'delete_template' ) );
+
+		add_filter( 'pmxi_article_data', array( $bulk_ai_post, 'get_content' ), 10, 4 );
 
 	}
 
@@ -192,7 +196,7 @@ class Bulk_AI {
 			case 'edit-template-form':
 				$template_data             = get_post( $request['template-id'], 'ARRAY_A' );
 				$sections                  = get_post_meta( $template_data['ID'], 'sections' );
-				$template_data['sections'] = json_decode( $sections[0], true );
+				$template_data['sections'] = json_decode( $sections[0], true, 512, JSON_UNESCAPED_UNICODE );
 
 				$view = $template->load( namespace\PATH . 'templates/edit-template-form.php', array( 'template_data' => $template_data ) );
 				break;
@@ -213,7 +217,7 @@ class Bulk_AI {
 	public function register_bulkai_template_post_type(): void {
 
 		$args = array(
-			'public' => true,
+			'public' => false,
 		);
 
 		register_post_type( 'bulk-ai-template', $args );
