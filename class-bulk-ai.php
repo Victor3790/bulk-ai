@@ -33,7 +33,7 @@ if ( ! class_exists( '\Vk_custom_libs\Templates' ) ) {
 
 require_once namespace\PATH . 'includes/class-bulk-ai-template.php';
 require_once namespace\PATH . 'includes/class-bulk-ai-list-table.php';
-require_once namespace\PATH . 'includes/class-bulk-ai-post.php';
+require_once namespace\PATH . 'includes/class-bulk-ai-content.php';
 
 use Vk_custom_libs\Template;
 use Vk_custom_libs\Settings;
@@ -56,7 +56,6 @@ class Bulk_AI {
 	private function __construct() {
 
 		$bulk_ai_template = new Bulk_AI_Template();
-		$bulk_ai_post     = new Bulk_AI_Post();
 
 		register_activation_hook( __FILE__, array( $this, 'activate_plugin' ) );
 		register_deactivation_hook( __FILE__, array( $this, 'deactivate_plugin' ) );
@@ -71,7 +70,7 @@ class Bulk_AI {
 		add_action( 'admin_post_bulk_ai_update_template', array( $bulk_ai_template, 'update_template' ) );
 		add_action( 'admin_post_bulk_ai_delete_template', array( $bulk_ai_template, 'delete_template' ) );
 
-		add_filter( 'pmxi_article_data', array( $bulk_ai_post, 'get_content' ), 10, 4 );
+		add_filter( 'pmxi_article_data', array( $this, 'get_content' ), 10, 4 );
 
 	}
 
@@ -252,6 +251,44 @@ class Bulk_AI {
 			'1.0.0',
 			true
 		);
+
+	}
+
+	/**
+	 * Create a post based on a template.
+	 *
+	 * @param array  $article_data Current article data.
+	 * @param object $import The import object.
+	 * @param object $post_to_update Post object for the post that's being updated.
+	 * @param array  $current_xml_node Parsed data for the current import record.
+	 */
+	public function get_content( $article_data, $import, $post_to_update, $current_xml_node ): array {
+
+		$query = new \WP_Query(
+			array(
+				'post_type' => 'bulk-ai-template',
+				'name'      => $current_xml_node['bai_template'],
+			)
+		);
+
+		if ( ! $query->have_posts() ) {
+
+			return $article_data;
+
+		}
+
+		$content = new Bulk_AI_Content();
+
+		$template_data = $query->get_posts()[0]->to_array();
+
+		$template_content      = $template_data['post_content'];
+		$raw_template_sections = get_post_meta( $template_data['ID'], 'sections' );
+		$template_sections     = json_decode( $raw_template_sections[0], true );
+
+		$content = $content->replace_sections_in_content( $template_sections, $template_content );
+
+		$article_data['post_content'] = $content;
+		return $article_data;
 
 	}
 
