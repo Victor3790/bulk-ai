@@ -9,7 +9,11 @@
 use PHPUnit\Framework\TestCase;
 use bulk_ai\Bulk_AI_Content;
 
-require dirname( __FILE__ ) . '/../includes/class-bulk-ai-content.php';
+if( ! class_exists( 'bulk_ai\Bulk_AI_Content' ) ) {
+
+    require dirname( __FILE__ ) . '/../includes/class-bulk-ai-content.php';
+
+}
 
 /**
  * Replacing node data in template sections.
