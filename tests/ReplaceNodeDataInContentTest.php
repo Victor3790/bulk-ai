@@ -150,10 +150,10 @@ final class ReplaceNodeDataInContentTest extends TestCase {
 			'bai_comida'   => 'Paella',
 		);
         $content = '<h1>Artículo sobre {bai_comida}</h1>
-        {intro}';
+            {intro}';
 
         $expected_content = '<h1>Artículo sobre Paella</h1>
-        {intro}';
+            {intro}';
 
         $data = $this->bulkAiContent->replace_node_data_in_content( $node_data, $content );
 
@@ -172,18 +172,18 @@ final class ReplaceNodeDataInContentTest extends TestCase {
 			'bai_comida'   => 'Paella',
 		);
         $content = '<h1>Artículo sobre {bai_comida}, el mejor platillo de {bai_ciudad}</h1>
-        {intro}
-        
-        {bai_comida} es el platillo más delicioso de {bai_ciudad}.
-        
-        Si tienes la oportunidad de visitar {bai_ciudad}, no olvides acudir a algún restaurante para probar {bai_comida}.';
+            {intro}
+            
+            {bai_comida} es el platillo más delicioso de {bai_ciudad}.
+            
+            Si tienes la oportunidad de visitar {bai_ciudad}, no olvides acudir a algún restaurante para probar {bai_comida}.';
 
         $expected_content = '<h1>Artículo sobre Paella, el mejor platillo de Madrid</h1>
-        {intro}
-        
-        Paella es el platillo más delicioso de Madrid.
-        
-        Si tienes la oportunidad de visitar Madrid, no olvides acudir a algún restaurante para probar Paella.';
+            {intro}
+            
+            Paella es el platillo más delicioso de Madrid.
+            
+            Si tienes la oportunidad de visitar Madrid, no olvides acudir a algún restaurante para probar Paella.';
 
         $data = $this->bulkAiContent->replace_node_data_in_content( $node_data, $content );
 
