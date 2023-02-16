@@ -136,11 +136,11 @@ class Bulk_AI_Content {
 
 			$section_name = '{' . $section['name'] . '}';
 
-			$new_content = str_replace( $section_name, $section['content'], $content );
+			$content = str_replace( $section_name, $section['content'], $content );
 
 		}
 
-		return $new_content;
+		return $content;
 
 	}
 

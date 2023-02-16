@@ -33,18 +33,24 @@ class Open_AI_Api_Connection {
 			'https://api.openai.com/v1/completions',
 			array(
 				'method'  => 'POST',
-				'timeout' => 10,
+				'timeout' => 60,
 				'headers' => array(
 					'Content-Type'  => 'application/json',
 					'Authorization' => 'Bearer ' . $access_token,
 				),
 				'body'    => '{
-					"model": "text-davinci-003",
+					"model": "text-curie-001",
 					"prompt": "' . $prompt . '",
-					"max_tokens": 50
+					"max_tokens": 1048
 				  }',
 			)
 		);
+
+		if ( is_wp_error( $response ) ) {
+
+			throw new \Exception( 'Bulk AI error: Invalid response. Wp message: ' . $response->get_error_message(), 2 );
+
+		}
 
 		$body = $response['body'];
 
@@ -53,6 +59,19 @@ class Open_AI_Api_Connection {
 		if ( empty( $data ) ) {
 
 			throw new \Exception( 'Bulk AI error: Invalid response.', 2 );
+
+		}
+
+		if ( true === WP_DEBUG ) {
+
+			//phpcs:ignore
+			error_log( print_r( 'Open AI usage data:', true ) );
+			//phpcs:ignore
+			error_log( print_r( 'Prompt tokens: ' . $data['usage']['prompt_tokens'], true ) );
+			//phpcs:ignore
+			error_log( print_r( 'Completion tokens: ' . $data['usage']['completion_tokens'], true ) );
+			//phpcs:ignore
+			error_log( print_r( 'Total tokens: ' . $data['usage']['total_tokens'], true ) );
 
 		}
 
