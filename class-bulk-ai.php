@@ -34,6 +34,7 @@ if ( ! class_exists( '\Vk_custom_libs\Templates' ) ) {
 require_once namespace\PATH . 'includes/class-bulk-ai-template.php';
 require_once namespace\PATH . 'includes/class-bulk-ai-list-table.php';
 require_once namespace\PATH . 'includes/class-bulk-ai-content.php';
+require_once namespace\PATH . 'includes/class-open-ai-api-connection.php';
 
 use Vk_custom_libs\Template;
 use Vk_custom_libs\Settings;
@@ -277,7 +278,8 @@ class Bulk_AI {
 
 		}
 
-		$content = new Bulk_AI_Content();
+		$content            = new Bulk_AI_Content();
+		$open_ai_connection = new Open_AI_Api_Connection();
 
 		$template_data = $query->get_posts()[0]->to_array();
 
@@ -285,7 +287,8 @@ class Bulk_AI {
 		$raw_template_sections = get_post_meta( $template_data['ID'], 'sections' );
 		$template_sections     = json_decode( $raw_template_sections[0], true );
 
-		$content = $content->replace_sections_in_content( $template_sections, $template_content );
+		$new_content = $content->replace_sections_in_content( $template_sections, $template_content );
+		$ai_sections = $content->get_section_data( $open_ai_connection, $template_sections );
 
 		$article_data['post_content'] = $content;
 		return $article_data;

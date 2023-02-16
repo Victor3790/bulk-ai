@@ -86,6 +86,45 @@ class Bulk_AI_Content {
 	}
 
 	/**
+	 * Get section data from Open AI.
+	 *
+	 * @param Open_AI_Api_Connection $open_ai_connection Establishes the connection with Open AI.
+	 * @param Array                  $sections The section array with the prompts.
+	 * @throws \Exception In case of wrong order or wrong section name.
+	 */
+	public function get_section_data( Open_AI_Api_Connection $open_ai_connection, array $sections ): array {
+
+		$filled_sections = array();
+
+		foreach ( $sections as $section_key => $section ) {
+
+			if ( preg_match( '/\{.+\}/', $section['content'] ) ) {
+
+				foreach ( $filled_sections as $filled_section_key => $filled_section ) {
+
+					$tag = '{' . $filled_section['name'] . '}';
+
+					$section['content'] = str_replace( $tag, $filled_section['content'], $section['content'] );
+
+				}
+
+				if ( preg_match( '/\{.+\}/', $section['content'] ) ) {
+
+					throw new \Exception( 'Bulk AI error: Wrong order or wrong section name.', 100 );
+
+				}
+			}
+
+			$filled_sections[ $section_key ]['name']    = $section['name'];
+			$filled_sections[ $section_key ]['content'] = $open_ai_connection->get_completion( $section['content'] );
+
+		}
+
+		return $filled_sections;
+
+	}
+
+	/**
 	 * Substitute the sections in the content.
 	 *
 	 * @param array  $sections the sections to substitute in the content.
