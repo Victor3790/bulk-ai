@@ -69,7 +69,7 @@ class Bulk_AI_Template {
 		}
 
 		$template['content']  = wp_kses( wp_unslash( $_POST['content'] ), 'post' );
-		$template['sections'] = wp_json_encode( $sections, JSON_UNESCAPED_UNICODE );
+		$template['sections'] = $this->escape_string( wp_json_encode( $sections, JSON_UNESCAPED_UNICODE ) );
 		$template['model']    = wp_kses( wp_unslash( $_POST['ai-model'] ), 'post' );
 
 		$template_id = $this->insert( $template );
@@ -157,7 +157,7 @@ class Bulk_AI_Template {
 		}
 
 		$template['content']  = wp_kses( wp_unslash( $_POST['content'] ), 'post' );
-		$template['sections'] = wp_json_encode( $sections, JSON_UNESCAPED_UNICODE );
+		$template['sections'] = $this->escape_string( wp_json_encode( $sections, JSON_UNESCAPED_UNICODE ) );
 		$template['model']    = wp_kses( wp_unslash( $_POST['ai-model'] ), 'post' );
 
 		$template['id']      = $template_id;
@@ -299,6 +299,23 @@ class Bulk_AI_Template {
 
 		wp_safe_redirect( $redirect_url );
 		exit;
+
+	}
+
+	/**
+	 * Escape special characters.
+	 *
+	 * @param string $string string to escape.
+	 */
+	private function escape_string( string $string ): string {
+
+		$result = '';
+
+		$escapers     = array( '\\', '/', '\"', '\n', '\r', '\t', '\x08', '\x0c' );
+		$replacements = array( '\\\\', '\\/', '\\\"', '\\n', '\\r', '\\t', '\\f', '\\b' );
+		$result       = str_replace( $escapers, $replacements, $string );
+
+		return $result;
 
 	}
 
