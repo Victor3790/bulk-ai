@@ -287,11 +287,11 @@ class Bulk_AI {
 		$template_content      = $template_data['post_content'];
 		$raw_template_sections = get_post_meta( $template_data['ID'], 'sections' );
 		$template_sections     = json_decode( $raw_template_sections[0], true );
-		$ai_model              = get_post_meta( $template_data['ID'], 'model' );
+		$ai_model              = get_post_meta( $template_data['ID'], 'model', true );
 
 		// Get section data.
 		$sections_with_node_data    = $content->replace_node_data_in_sections( $current_xml_node, $template_sections );
-		$sections_with_open_ai_data = $content->get_section_data( $open_ai_connection, $sections_with_node_data );
+		$sections_with_open_ai_data = $content->get_section_data( $open_ai_connection, $sections_with_node_data, $ai_model );
 
 		// Fill sections into content.
 		$content_with_node_data = $content->replace_node_data_in_content( $current_xml_node, $template_content );
