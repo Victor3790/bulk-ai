@@ -63,6 +63,54 @@
 		<div class="table-footer">
 			<div id="add-item-button" class="button input-item__button input-item__button--green">Add section</div>
 		</div>
+		<label for="ai_model">Open AI model.</label><br>
+		<select name="ai-model" id="ai-model">
+			<?php
+			if ( empty( $template_data['model'] ) ) {
+				$template_data['model'] = array( '0' );
+			}
+			?>
+			<option value="0">Select a model</option>
+
+			<option value="1" 
+				<?php
+				if ( '1' === $template_data['model'][0] ) {
+					echo 'selected';
+				}
+				?>
+			>
+				text-davinci-003
+			</option>
+
+			<option value="2" 
+				<?php
+				if ( '2' === $template_data['model'][0] ) {
+					echo 'selected';
+				}
+				?>
+			>
+				text-curie-001
+			</option>
+			<option value="3" 
+				<?php
+				if ( '3' === $template_data['model'][0] ) {
+					echo 'selected';
+				}
+				?>
+			>
+				text-babbage-001
+			</option>
+			<option value="4" 
+				<?php
+				if ( '4' === $template_data['model'][0] ) {
+					echo 'selected';
+				}
+				?>
+			>
+				text-ada-001
+			</option>
+
+		</select>
 		<?php wp_editor( $template_data['post_content'], 'content', array( 'media_buttons' => false ) ); ?>
 		<input type="hidden" name="action" value="bulk_ai_update_template">
 		<input type="hidden" name="template-id" value="<?php echo wp_kses( $template_data['ID'], 'post' ); ?>">

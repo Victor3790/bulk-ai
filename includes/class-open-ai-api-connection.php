@@ -14,12 +14,44 @@ class Open_AI_Api_Connection {
 	/**
 	 * Get the completion based on a prompt.
 	 *
-	 * @param  string $prompt the prompt to send to Open AI.
+	 * @param  String $prompt the prompt to send to Open AI.
+	 * @param  String $model The Open AI model to use.
 	 * @throws \Exception If The Open AI API KEY was not set.
 	 */
-	public function get_completion( string $prompt ): string {
+	public function get_completion( string $prompt, string $model ): string {
 
-		$wp_http_curl = new \WP_Http_Curl();
+		if ( empty( $model ) || ! is_numeric( $model ) || (int) $model > 4 ) {
+
+			throw new \Exception( 'Bulk AI error: Incorrect Open AI model id.', 1 );
+
+		}
+
+		switch ( $model ) {
+			case '1':
+				$model_name = 'text-davinci-003';
+				$max_tokens = 3200;
+				break;
+
+			case '2':
+				$model_name = 'text-curie-001';
+				$max_tokens = 1248;
+				break;
+
+			case '3':
+				$model_name = 'text-babbage-001';
+				$max_tokens = 1248;
+				break;
+
+			case '4':
+				$model_name = 'text-ada-001	';
+				$max_tokens = 1248;
+				break;
+
+			default:
+				$model_name = 'text-davinci-003';
+				$max_tokens = 1248;
+				break;
+		}
 
 		$access_token = get_option( 'bulk-ai-api-token' );
 
@@ -28,6 +60,8 @@ class Open_AI_Api_Connection {
 			throw new \Exception( 'Bulk AI error: No API Key set.', 1 );
 
 		}
+
+		$wp_http_curl = new \WP_Http_Curl();
 
 		$response = $wp_http_curl->request(
 			'https://api.openai.com/v1/completions',
@@ -39,9 +73,9 @@ class Open_AI_Api_Connection {
 					'Authorization' => 'Bearer ' . $access_token,
 				),
 				'body'    => '{
-					"model": "text-curie-001",
+					"model": "' . $model_name . '",
 					"prompt": "' . $prompt . '",
-					"max_tokens": 1048
+					"max_tokens": ' . $max_tokens . '
 				  }',
 			)
 		);

@@ -90,9 +90,10 @@ class Bulk_AI_Content {
 	 *
 	 * @param Open_AI_Api_Connection $open_ai_connection Establishes the connection with Open AI.
 	 * @param Array                  $sections The section array with the prompts.
+	 * @param String                 $model The Open AI model to use.
 	 * @throws \Exception In case of wrong order or wrong section name.
 	 */
-	public function get_section_data( Open_AI_Api_Connection $open_ai_connection, array $sections ): array {
+	public function get_section_data( Open_AI_Api_Connection $open_ai_connection, array $sections, string $model ): array {
 
 		$filled_sections = array();
 
@@ -116,7 +117,7 @@ class Bulk_AI_Content {
 			}
 
 			$filled_sections[ $section_key ]['name']    = $section['name'];
-			$filled_sections[ $section_key ]['content'] = $open_ai_connection->get_completion( $section['content'] );
+			$filled_sections[ $section_key ]['content'] = $open_ai_connection->get_completion( $section['content'], $model );
 
 		}
 

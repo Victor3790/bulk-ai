@@ -53,6 +53,14 @@
 		<div class="table-footer">
 			<div id="add-item-button" class="button input-item__button input-item__button--green">Add section</div>
 		</div>
+		<label for="ai_model">Open AI model.</label><br>
+		<select name="ai-model" id="ai-model">
+			<option value="0">Select a model</option>
+			<option value="1">text-davinci-003</option>
+			<option value="2">text-curie-001</option>
+			<option value="3">text-babbage-001</option>
+			<option value="4">text-ada-001</option>
+		</select>
 		<?php wp_editor( '', 'content', array( 'media_buttons' => false ) ); ?>
 		<input type="hidden" name="action" value="bulk_ai_create_template">
 		<?php wp_nonce_field( 'bulkai-create-template', 'bulkai-create-template-nonce' ); ?>

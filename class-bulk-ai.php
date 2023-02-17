@@ -196,6 +196,7 @@ class Bulk_AI {
 			case 'edit-template-form':
 				$template_data             = get_post( $request['template-id'], 'ARRAY_A' );
 				$sections                  = get_post_meta( $template_data['ID'], 'sections' );
+				$template_data['model']    = get_post_meta( $template_data['ID'], 'model' );
 				$template_data['sections'] = json_decode( $sections[0], true, 512, JSON_UNESCAPED_UNICODE );
 
 				$view = $template->load( namespace\PATH . 'templates/edit-template-form.php', array( 'template_data' => $template_data ) );
@@ -286,6 +287,7 @@ class Bulk_AI {
 		$template_content      = $template_data['post_content'];
 		$raw_template_sections = get_post_meta( $template_data['ID'], 'sections' );
 		$template_sections     = json_decode( $raw_template_sections[0], true );
+		$ai_model              = get_post_meta( $template_data['ID'], 'model' );
 
 		// Get section data.
 		$sections_with_node_data    = $content->replace_node_data_in_sections( $current_xml_node, $template_sections );

@@ -39,7 +39,12 @@ class Bulk_AI_Template {
 
 		}
 
-		if ( empty( $_POST['template-name'] ) || empty( $_POST['section-name'] ) || empty( $_POST['section-content'] ) || empty( $_POST['content'] ) ) {
+		if (
+			empty( $_POST['template-name'] ) ||
+			empty( $_POST['section-name'] ) ||
+			empty( $_POST['section-content'] ) ||
+			empty( $_POST['content'] ) ||
+			empty( $_POST['ai-model'] ) ) {
 
 			$new_template_form_url = $this->get_new_template_form_url();
 			$redirect_url          = add_query_arg( 'result-code', '0', $new_template_form_url );
@@ -63,9 +68,9 @@ class Bulk_AI_Template {
 
 		}
 
-		$template['content'] = wp_kses( wp_unslash( $_POST['content'] ), 'post' );
-
+		$template['content']  = wp_kses( wp_unslash( $_POST['content'] ), 'post' );
 		$template['sections'] = wp_json_encode( $sections, JSON_UNESCAPED_UNICODE );
+		$template['model']    = wp_kses( wp_unslash( $_POST['ai-model'] ), 'post' );
 
 		$template_id = $this->insert( $template );
 
@@ -122,7 +127,12 @@ class Bulk_AI_Template {
 
 		}
 
-		if ( empty( $_POST['template-name'] ) || empty( $_POST['section-name'] ) || empty( $_POST['section-content'] ) || empty( $_POST['content'] ) ) {
+		if (
+			empty( $_POST['template-name'] ) ||
+			empty( $_POST['section-name'] ) ||
+			empty( $_POST['section-content'] ) ||
+			empty( $_POST['content'] ) ||
+			empty( $_POST['ai-model'] ) ) {
 
 			$edit_template_form_url = $this->get_edit_template_form_url( $template_id );
 			$redirect_url           = add_query_arg( 'result-code', '0', $edit_template_form_url );
@@ -146,9 +156,9 @@ class Bulk_AI_Template {
 
 		}
 
-		$template['content'] = wp_kses( wp_unslash( $_POST['content'] ), 'post' );
-
+		$template['content']  = wp_kses( wp_unslash( $_POST['content'] ), 'post' );
 		$template['sections'] = wp_json_encode( $sections, JSON_UNESCAPED_UNICODE );
+		$template['model']    = wp_kses( wp_unslash( $_POST['ai-model'] ), 'post' );
 
 		$template['id']      = $template_id;
 		$updated_template_id = $this->insert( $template );
@@ -256,7 +266,10 @@ class Bulk_AI_Template {
 			'post_status'    => 'private',
 			'post_type'      => 'bulk-ai-template',
 			'comment_status' => 'closed',
-			'meta_input'     => array( 'sections' => $template_data['sections'] ),
+			'meta_input'     => array(
+				'sections' => $template_data['sections'],
+				'model'    => $template_data['model'],
+			),
 		);
 
 		if ( ! empty( $template_data['id'] ) ) {
