@@ -67,7 +67,7 @@ class Open_AI_Api_Connection {
 			'https://api.openai.com/v1/completions',
 			array(
 				'method'  => 'POST',
-				'timeout' => 60,
+				'timeout' => 85,
 				'headers' => array(
 					'Content-Type'  => 'application/json',
 					'Authorization' => 'Bearer ' . $access_token,
@@ -93,6 +93,12 @@ class Open_AI_Api_Connection {
 		if ( empty( $data ) ) {
 
 			throw new \Exception( 'Bulk AI error: Invalid response.', 2 );
+
+		}
+
+		if ( isset( $data['error'] ) ) {
+
+			throw new \Exception( 'Bulk AI error: Open AI, responded with an error. ' . $data['error']['message'], 3 );
 
 		}
 
