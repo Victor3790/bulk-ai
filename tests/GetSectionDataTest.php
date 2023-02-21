@@ -44,7 +44,7 @@ final class GetSectionDataTest extends TestCase {
 
         $stub = $this->createStub( bulk_ai\Open_AI_Api_Connection::class );
         
-        $data = $this->bulkAiContent->get_section_data( $stub, array() );
+        $data = $this->bulkAiContent->get_section_data( $stub, array(), '1' );
 
         $this->assertEmpty( $data );
 
@@ -88,7 +88,7 @@ final class GetSectionDataTest extends TestCase {
 			),
 		);
 
-        $result_sections = $this->bulkAiContent->get_section_data( $stub, $sections );
+        $result_sections = $this->bulkAiContent->get_section_data( $stub, $sections, '1' );
 
         $this->assertSame( $result_sections, $expected_sections );
 
@@ -140,7 +140,7 @@ final class GetSectionDataTest extends TestCase {
 			),
 		);
 
-        $result_sections = $this->bulkAiContent->get_section_data( $stub, $sections );
+        $result_sections = $this->bulkAiContent->get_section_data( $stub, $sections, '1' );
 
         $this->assertSame( $result_sections, $expected_sections );        
 
@@ -192,7 +192,7 @@ final class GetSectionDataTest extends TestCase {
 			),
 		);
 
-        $result_sections = $this->bulkAiContent->get_section_data( $stub, $sections );
+        $result_sections = $this->bulkAiContent->get_section_data( $stub, $sections, '1' );
 
         $this->assertSame( $result_sections, $expected_sections );        
 
@@ -228,7 +228,7 @@ final class GetSectionDataTest extends TestCase {
         $this->expectException( \Exception::class );
         $this->expectExceptionCode( 100 );
 
-        $result_sections = $this->bulkAiContent->get_section_data( $stub, $sections );
+        $result_sections = $this->bulkAiContent->get_section_data( $stub, $sections, '1' );
 
     }
 
@@ -262,7 +262,55 @@ final class GetSectionDataTest extends TestCase {
         $this->expectException( \Exception::class );
         $this->expectExceptionCode( 100 );
 
-        $result_sections = $this->bulkAiContent->get_section_data( $stub, $sections );
+        $result_sections = $this->bulkAiContent->get_section_data( $stub, $sections, '1' );
 
     }
+
+	/**
+	 * Test for line breaks in nodes.
+	 */
+	public function testLineBreaksInNodes(): void {
+
+		$stub = $this->createStub( bulk_ai\Open_AI_Api_Connection::class );
+        $stub->method('get_completion')->willReturnArgument(0);
+
+		$sections  = array(
+			array( 
+				'name' => 'intro', 
+				'content' => 'Intro prompt',
+			),
+			array(
+				'name' => 'lista_1',
+				'content' => 	'Item 1
+								 Item 2
+								 Item 3
+								 Item 4
+								 Item 5'
+			),
+            array(
+				'name' => 'seccion_1',
+				'content' => '{lista_1}. Seccion 2 prompt'
+			),
+		);
+
+		$expected_sections  = array(
+			array( 
+				'name' => 'intro', 
+				'content' => 'Intro prompt',
+			),
+			array(
+				'name' => 'lista_1',
+				'content' => 'Item 1, Item 2, Item 3, Item 4, Item 5'
+			),
+            array(
+				'name' => 'seccion_1',
+				'content' => 'Item 1, Item 2, Item 3, Item 4, Item 5. Seccion 2 prompt'
+			),
+		);
+
+		$result_sections = $this->bulkAiContent->get_section_data( $stub, $sections, '1' );
+
+		$this->assertSame( $expected_sections, $result_sections );
+
+	}
 }

@@ -116,7 +116,10 @@ class Bulk_AI_Content {
 				}
 			}
 
-			$filled_sections[ $section_key ]['name']    = $section['name'];
+			$filled_sections[ $section_key ]['name'] = $section['name'];
+
+			$section['content'] = $this->escape_line_breaks( $section['content'] );
+
 			$filled_sections[ $section_key ]['content'] = $open_ai_connection->get_completion( $section['content'], $model );
 
 		}
@@ -142,6 +145,22 @@ class Bulk_AI_Content {
 		}
 
 		return $content;
+
+	}
+
+	/**
+	 * Escape line breaks.
+	 *
+	 * @param string $string string to escape.
+	 */
+	private function escape_line_breaks( string $string ): string {
+
+		$result = '';
+
+		$result = preg_replace( '/\r|\n/', '', $string );
+		$result = preg_replace( '/\t/', '', $result );
+
+		return $result;
 
 	}
 
